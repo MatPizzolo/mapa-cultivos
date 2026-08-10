@@ -340,6 +340,23 @@ function dibujarLeyenda() {
 const fmtPct = (v) => (v == null ? '—' : `${(v * 100).toFixed(1)} %`);
 const fmtNum = (v) => (v == null ? '—' : v.toFixed(3));
 
+// Traducción en criollo del par clásicas-rf vs embeddings-rf: la comparación
+// que más le importa a alguien que no lee una tabla de p-valores (SPEC §8).
+function fraseCriolla(zona) {
+  const comp = (zona.comparaciones || []).find((c) => c.a === 'clasicas-rf' && c.b === 'embeddings-rf');
+  if (!comp) return '';
+  const cl = zona.modelos['clasicas-rf'].acuerdo_mnc.overall;
+  const em = zona.modelos['embeddings-rf'].acuerdo_mnc.overall;
+  if (cl == null || em == null) return '';
+  const p = comp.p;
+  const pTxt = p < 0.001 ? '< 0,001' : `= ${p.toFixed(3).replace('.', ',')}`;
+  const base = `De cada 100 píxeles, ${Math.round(cl * 100)} dicen lo mismo que el mapa del INTA con las
+    features clásicas y ${Math.round(em * 100)} con AlphaEarth`;
+  return comp.significativo
+    ? `${base} — la diferencia es estadísticamente real (McNemar, p ${pTxt}).`
+    : `${base} — y con esta muestra los dos enfoques no se distinguen (McNemar, p ${pTxt}).`;
+}
+
 function dibujarMetricas() {
   const zona = estado.metrics.zonas[estado.zona];
   const cont = $('metricas-contenido');
@@ -351,6 +368,19 @@ function dibujarMetricas() {
     ['embeddings-rf', 'AlphaEarth · RF'],
     ['embeddings-knn', 'AlphaEarth · kNN'],
   ];
+
+  // Cuatro fichas, un vistazo: acuerdo con MNC por modelo, antes de la tabla completa.
+  const fichas = modelos.map(([clave, nombre]) => {
+    const a = zona.modelos[clave].acuerdo_mnc;
+    const ic = a.ic95 && a.ic95[0] != null ? `IC 95: ${fmtPct(a.ic95[0])}–${fmtPct(a.ic95[1])}` : '';
+    const familia = clave.startsWith('clasicas') ? 'clasicas' : 'embeddings';
+    return `<div class="ficha-modelo ${familia}">
+      <div class="ficha-label">${nombre}</div>
+      <div class="ficha-num">${fmtPct(a.overall)}</div>
+      <div class="ficha-ic">${ic}</div></div>`;
+  }).join('');
+
+  const frase = fraseCriolla(zona);
 
   // Cada número dice contra qué se midió: acuerdo con MNC ≠ accuracy (METODOLOGIA §1).
   const filas = modelos.map(([clave, nombre]) => {
@@ -369,6 +399,8 @@ function dibujarMetricas() {
 
   cont.innerHTML = `
     ${sinCorrer}
+    <div class="fichas-2x2">${fichas}</div>
+    ${frase ? `<p class="nota-metrica frase-criolla">${frase}</p>` : ''}
     <table>
       <thead><tr><th>Modelo</th><th>Acuerdo con MNC</th><th>Kappa*</th><th>Accuracy independiente</th></tr></thead>
       <tbody>${filas}</tbody>

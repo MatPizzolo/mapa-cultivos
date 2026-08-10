@@ -449,6 +449,14 @@ button { -webkit-tap-highlight-color: transparent; }
   margin: 6px 0;
 }
 
+.fichas-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.ficha-modelo { border: 1px solid var(--borde); border-radius: 10px; padding: 8px 10px; }
+.ficha-modelo.clasicas { border-left: 4px solid var(--teal); }
+.ficha-modelo.embeddings { border-left: 4px solid var(--naranja); }
+.ficha-modelo .ficha-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .04em; color: var(--gris-texto); }
+.ficha-modelo .ficha-num { font-size: 1.45rem; font-weight: 800; }
+.ficha-modelo .ficha-ic { font-size: 0.68rem; color: var(--gris-texto); }
+
 /* ---- curtain: visible divider + 44 px grabbable handle ---- */
 
 .leaflet-sbs-divider {
