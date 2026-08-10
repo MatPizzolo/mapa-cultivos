@@ -1,0 +1,498 @@
+/* Mobile-first: the intended device is a phone on 4G at a fair stand.
+   Budget: this file + app.js + Leaflet must stay under 300 KB transferred.
+   Identity: "Campo moderno" — green header, pill chips, soft shadows, system sans.
+   The class palette lives in data/leyenda.json and is never redefined here. */
+
+:root {
+  --tinta: #2b2b24;
+  --fondo: #f6f3ea;
+  --panel: #ffffff;
+  --borde: #d8d5cd;
+  --verde: #2f6c46;       /* AA on white for text-sized use */
+  --ocre: #8a5a1a;        /* AlphaEarth side accent, AA on white */
+  --gris-texto: #555d56;
+  --aviso-fondo: #7a4a12; /* unvalidated-campaign band, AA with white text */
+  --sombra: 0 2px 10px rgba(25, 28, 24, 0.2);
+  --radio: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--tinta);
+  background: var(--fondo);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+:focus-visible {
+  outline: 3px solid var(--verde);
+  outline-offset: 2px;
+}
+
+button { -webkit-tap-highlight-color: transparent; }
+
+/* ---- header: title + control chips (layout C: controls live up here) ---- */
+
+.topbar {
+  padding: 8px 12px 10px;
+  background: var(--verde);
+  color: #fff;
+  z-index: 1100;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.subtitulo {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.controles {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.control {
+  flex: 1.15;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.control select {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 40px;
+  width: 100%;
+  padding: 6px 26px 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat right 10px center / 12px 8px;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* Zone carries the longest text; the classifier the shortest */
+.control:nth-child(1) { flex: 1.3; }
+.control:nth-child(3) { flex: 0.7; }
+
+/* Narrow phones: tighter chips so nothing ellipsizes down to 320 px */
+@media (max-width: 374px) {
+  .controles { gap: 4px; }
+  .control select {
+    font-size: 0.8rem;
+    padding: 6px 20px 6px 9px;
+    background-position: right 7px center;
+  }
+}
+
+.control select:focus-visible,
+.topbar :focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ---- warning bands ---- */
+
+.banda-aviso {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--aviso-fondo);
+  z-index: 1100;
+}
+
+.banda-pendiente {
+  background: #54504a;
+  font-weight: 400;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
+
+.reintentar-link {
+  background: none;
+  border: none;
+  color: #fff;
+  text-decoration: underline;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.reintentar-link:focus-visible { outline: 3px solid #fff; }
+
+/* ---- map frame: everything floats inside this box ---- */
+
+.mapa-marco {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+
+#map {
+  flex: 1;
+  min-height: 0;
+  z-index: 1;
+}
+
+/* Curtain side labels: nothing else on the map says which side is which */
+
+.etiqueta-lado {
+  position: absolute;
+  top: 10px;
+  z-index: 1000;
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: var(--sombra);
+  pointer-events: none;
+}
+
+.etiqueta-izq { left: 10px; color: var(--verde); }
+.etiqueta-der { right: 10px; color: var(--ocre); }
+
+/* Zoom control sits below the right-side label */
+.leaflet-top.leaflet-right { top: 40px; }
+
+/* ---- floating chips: legend toggle (left) and metrics (right) ---- */
+
+#leyenda-toggle,
+#btn-metricas {
+  position: absolute;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 1000;
+  min-height: 44px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: var(--sombra);
+  cursor: pointer;
+}
+
+#leyenda-toggle {
+  left: 10px;
+  background: var(--panel);
+  color: var(--tinta);
+}
+
+#btn-metricas {
+  right: 10px;
+  background: var(--verde);
+  color: #fff;
+}
+
+/* ---- legend: patterns on top of color so hue is never the only channel (SPEC §8) ---- */
+
+#leyenda {
+  position: absolute;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  left: 10px;
+  z-index: 1000;
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 8px 10px;
+  max-width: 60vw;
+}
+
+#leyenda h2 {
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gris-texto);
+}
+
+#leyenda ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.78rem;
+}
+
+#leyenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 0;
+}
+
+.muestra-color {
+  width: 18px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  flex: none;
+  background-color: var(--c, #999);
+}
+
+/* One pattern per class so hue is never the only channel */
+.patron-1 { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.75) 0 2px, transparent 2px 5px); }
+.patron-2 { background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,.4) 0 2px, transparent 2px 5px); }
+.patron-3 { background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.75) 0 2px, transparent 2px 5px); }
+.patron-4 { background-image: radial-gradient(rgba(255,255,255,.85) 1.2px, transparent 1.3px); background-size: 5px 5px; }
+.patron-5 { background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.4) 0 2px, transparent 2px 5px); }
+
+/* ---- ephemeral hint: fades after first interaction (or 10 s) ---- */
+
+.hint {
+  position: absolute;
+  top: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  margin: 0;
+  max-width: 86vw;
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--tinta);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  padding: 6px 12px;
+  box-shadow: var(--sombra);
+  pointer-events: none;
+}
+
+.hint.oculto {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---- cards: pixel inspector and no-tiles notice, anchored above the chips ---- */
+
+.tarjeta {
+  position: absolute;
+  z-index: 1050;
+  left: 10px;
+  right: 10px;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 12px 14px;
+}
+
+.tarjeta h2 { margin: 0 0 6px; font-size: 0.95rem; }
+
+.tarjeta dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+  font-size: 0.85rem;
+}
+
+.tarjeta dl[hidden] { display: none; }
+
+.tarjeta dt { font-weight: 600; color: var(--gris-texto); }
+.tarjeta dd { margin: 0; }
+
+.tarjeta-texto {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--gris-texto);
+}
+
+.tarjeta-acciones {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-primario {
+  background: var(--verde);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 10px 18px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secundario {
+  background: var(--panel);
+  color: var(--gris-texto);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.desacuerdo {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8a3b12;
+}
+
+.coords {
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+  color: var(--gris-texto);
+}
+
+.cerrar {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--tinta);
+}
+
+/* ---- pixel marker: white + ink double ring, visible over any class color ---- */
+
+.marcador-pixel {
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--tinta), inset 0 0 0 2px var(--tinta);
+  background: transparent;
+}
+
+/* ---- metrics panel: bottom sheet ---- */
+
+#panel-metricas {
+  position: absolute;
+  z-index: 1200;
+  inset: auto 0 0 0;
+  max-height: 72vh;
+  overflow-y: auto;
+  background: var(--panel);
+  border-top: 1px solid var(--borde);
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -4px 18px rgba(25, 28, 24, 0.25);
+  padding: 10px 14px calc(14px + env(safe-area-inset-bottom));
+}
+
+.panel-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-encabezado h2 { margin: 0; font-size: 1rem; }
+.panel-encabezado .cerrar { position: static; }
+
+#metricas-contenido table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 0.8rem;
+}
+
+#metricas-contenido th,
+#metricas-contenido td {
+  border: 1px solid var(--borde);
+  padding: 5px 7px;
+  text-align: left;
+}
+
+#metricas-contenido th { background: var(--fondo); }
+
+.nota-metrica {
+  font-size: 0.75rem;
+  color: var(--gris-texto);
+  margin: 6px 0;
+}
+
+/* ---- curtain: visible divider + 44 px grabbable handle ---- */
+
+.leaflet-sbs-divider {
+  width: 3px;
+  margin-left: -1.5px;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.45);
+}
+
+/* Webkit and moz thumb rules must stay separate: a combined selector is
+   dropped by both engines. vendor/range.css points at a missing PNG; this
+   inline SVG replaces it. */
+.leaflet-sbs-range::-webkit-slider-thumb {
+  height: 44px;
+  width: 44px;
+  border-radius: 22px;
+  border: none;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  background-size: 44px 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cpath d='M19 22h-8m4-4l-4 4 4 4m10-4h8m-4-4l4 4-4 4' stroke='%232f6c46' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.leaflet-sbs-range::-moz-range-thumb {
+  height: 44px;
+  width: 44px;
+  border-radius: 22px;
+  border: none;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  background-size: 44px 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cpath d='M19 22h-8m4-4l-4 4 4 4m10-4h8m-4-4l4 4-4 4' stroke='%232f6c46' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ---- wider screens ---- */
+
+@media (min-width: 700px) {
+  .topbar h1 { font-size: 1.2rem; }
+  .controles { max-width: 620px; }
+  .control { max-width: 200px; }
+  #leyenda { max-width: 240px; }
+  .tarjeta { left: auto; right: 10px; width: 340px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hint { transition: opacity 0.3s ease-out, visibility 0.3s ease-out; }
+  .tarjeta, #panel-metricas { transition: transform 0.18s ease-out, opacity 0.18s ease-out; }
+}

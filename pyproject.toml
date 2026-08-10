@@ -1,0 +1,34 @@
+[project]
+name = "mapa-cultivos"
+version = "0.1.0"
+description = "Clasificación supervisada de cultivos: Sentinel-2 clásico vs AlphaEarth embeddings"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "earthengine-api>=1.5",
+    "scikit-learn>=1.5",
+    "pandas>=2.2",
+    "pydantic-settings>=2.4",
+    "rasterio>=1.5.0",
+    "scipy>=1.18.0",
+    "pyarrow>=25.0.0",
+    "mercantile>=1.2.1",
+    "pillow>=12.3.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "httpx>=0.27",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mapa_cultivos"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

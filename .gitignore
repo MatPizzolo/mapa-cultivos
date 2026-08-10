@@ -1,0 +1,19 @@
+# Secrets — la key del service account no entra a git bajo ninguna circunstancia
+.env
+*-key.json
+service-account*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+dist/
+
+# Salidas pesadas de GEE — se regeneran, no se versionan
+*.tif
+*.tiff
+tiles/
+exports/
+.cache/
+.superpowers/

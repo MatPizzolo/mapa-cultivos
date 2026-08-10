@@ -1,0 +1,36 @@
+{
+  "_": "Única fuente de verdad de códigos, nombres y colores (SPEC §2). La paleta debe pasar un simulador de daltonismo antes de deployar; el par riesgoso es soja/maní.",
+  "clases": [
+    { "codigo": 0, "clase": "no agrícola", "color": "#9A9A93", "nota": "Urbano, agua, monte, caminos, suelo permanente" },
+    { "codigo": 1, "clase": "soja", "color": "#4C9F70", "nota": "Soja de primera. La clase mayoritaria en las dos zonas" },
+    { "codigo": 2, "clase": "maíz", "color": "#E8B33A", "nota": "Incluye maíz tardío, que desplaza el pico ~2 meses" },
+    { "codigo": 3, "clase": "trigo/soja 2ª", "color": "#7B5EA7", "nota": "Doble cultivo como una sola clase" },
+    { "codigo": 4, "clase": "maní", "color": "#D95F3B", "nota": "Solo presente en Río Cuarto" },
+    { "codigo": 5, "clase": "pastura/verdeo", "color": "#3E8E8C", "nota": "Pasturas perennes y verdeos de invierno" }
+  ],
+  "mapeo_mnc": {
+    "_": "Códigos del MNC 2024/25 (Zenodo 10.5281/zenodo.17652712, CC-BY-4.0, INTA). El MNC publica DOS mapas por campaña — invierno 2024 y verano 2025 — y la leyenda propia sale del CRUCE de ambos según las reglas de referencia.py. Códigos extraídos de los .qml oficiales.",
+    "invierno_2024": {
+      "6": "Garbanzo", "16": "Cereales de invierno", "17": "Otros cultivos",
+      "18": "Barbecho", "19": "Caña de azúcar", "20": "No agrícola",
+      "24": "Arveja", "25": "Máscara", "26": "Papa", "255": "sin dato"
+    },
+    "verano_2025": {
+      "10": "Maíz", "11": "Soja", "12": "Girasol", "13": "Poroto",
+      "14": "Caña de azúcar", "15": "Algodón", "16": "Maní", "17": "Arroz",
+      "18": "Sorgo", "19": "Girasol-CV", "21": "Barbecho", "22": "No agrícola",
+      "26": "Papa", "27": "Verdeo de Maíz", "28": "Verdeo de Sorgo",
+      "31": "Máscara", "255": "sin dato"
+    },
+    "reglas_cruce": {
+      "_": "Cómo (invierno, verano) se convierte en clase propia. Lo que no matchea ninguna regla queda EXCLUIDO del muestreo — no se fuerza a una clase. Implementado en referencia.py; discutido en docs/METODOLOGIA.md.",
+      "soja": "verano=Soja(11) y invierno≠Cereales de invierno(16) → 1 (soja de primera)",
+      "trigo_soja_2da": "invierno=Cereales de invierno(16) y verano=Soja(11) → 3",
+      "maiz": "verano=Maíz(10) → 2 (incluye tardío; el cruce cereal+maíz también cae acá)",
+      "mani": "verano=Maní(16) → 4",
+      "pastura_verdeo": "verano=Verdeo de Maíz(27) o Verdeo de Sorgo(28) → 5. Limitación: el MNC no tiene clase de pastura perenne; la clase 5 solo se muestrea desde verdeos",
+      "no_agricola": "invierno=No agrícola(20) y verano=No agrícola(22) → 0",
+      "excluidos": "Girasol, Sorgo, Poroto, Papa, barbecho/barbecho y todo otro cruce → sin clase (no entra al muestreo)"
+    }
+  }
+}

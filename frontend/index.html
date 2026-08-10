@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mapa de Cultivos con IA — clásico vs AlphaEarth</title>
+  <meta name="description" content="Qué se sembró en cada lote, según dos maneras distintas de mirar el mismo satélite.">
+  <link rel="stylesheet" href="vendor/leaflet.css">
+  <link rel="stylesheet" href="vendor/layout.css">
+  <link rel="stylesheet" href="vendor/range.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1>Mapa de Cultivos con IA</h1>
+  <p class="subtitulo">Dos modelos miran el mismo lote — compará vos</p>
+  <div class="controles" role="group" aria-label="Controles del visor">
+    <label class="control">
+      <span class="control-nombre">Zona</span>
+      <select id="sel-zona">
+        <option value="rio-cuarto" selected>Río Cuarto</option>
+        <option value="pergamino">Pergamino</option>
+      </select>
+    </label>
+    <label class="control">
+      <span class="control-nombre">Campaña</span>
+      <!-- Validation status lives in the persistent band (SPEC §8), not in the
+           chip: the long suffix truncated on narrow phones. -->
+      <select id="sel-campania">
+        <option value="2024-25" selected>2024/25</option>
+        <option value="2025-26">2025/26</option>
+      </select>
+    </label>
+    <label class="control">
+      <span class="control-nombre">Clasificador</span>
+      <select id="sel-clasificador">
+        <option value="rf" selected>RF</option>
+        <option value="knn">kNN</option>
+      </select>
+    </label>
+  </div>
+</header>
+
+<!-- Persistente por diseño cuando la campaña es 2025/26 — no es un toast (SPEC §8) -->
+<div id="banda-sin-validar" class="banda-aviso" role="status" hidden>
+  Campaña 2025/26 — inferencia sin validar. No hay capa del INTA publicada para contrastar.
+</div>
+
+<!-- Degraded-state band: shown when the no-tiles card was dismissed but tiles still fail -->
+<div id="banda-tiles" class="banda-aviso banda-pendiente" role="status" hidden>
+  <span id="banda-tiles-texto"></span>
+  <button id="banda-tiles-reintentar" class="reintentar-link" type="button">Reintentar ↻</button>
+</div>
+
+<div class="mapa-marco">
+  <main id="map" aria-label="Mapa comparativo de clasificación de cultivos"></main>
+
+  <span class="etiqueta-lado etiqueta-izq" aria-hidden="true">Clásico S2</span>
+  <span class="etiqueta-lado etiqueta-der" aria-hidden="true">AlphaEarth</span>
+
+  <button id="leyenda-toggle" type="button" aria-expanded="false" aria-controls="leyenda">▲ Clases</button>
+  <aside id="leyenda" aria-label="Leyenda de clases" hidden>
+    <h2>Clases</h2>
+    <ul id="leyenda-items"></ul>
+  </aside>
+
+  <button id="btn-metricas" type="button" aria-expanded="false" aria-controls="panel-metricas">Métricas</button>
+
+  <p id="hint" class="hint">Arrastrá la cortina para comparar · tocá el mapa para inspeccionar un píxel</p>
+
+  <!-- Ficha del inspector de píxel: el desacuerdo entre modelos es el contenido, no un error -->
+  <div id="inspector" class="tarjeta" role="dialog" aria-label="Inspector de píxel" hidden>
+    <button id="inspector-cerrar" class="cerrar" aria-label="Cerrar inspector">×</button>
+    <h2>Este píxel</h2>
+    <p id="insp-vacio" class="tarjeta-texto" hidden>Acá no hay datos clasificados.
+      Probá tocando dentro del área marcada, con el mapa cargado.</p>
+    <dl id="insp-datos">
+      <dt>Clásico (S2)</dt><dd id="insp-clasicas">—</dd>
+      <dt>AlphaEarth</dt><dd id="insp-embeddings">—</dd>
+      <dt>MNC (INTA)</dt><dd id="insp-mnc">—</dd>
+    </dl>
+    <p id="insp-desacuerdo" class="desacuerdo" hidden>Los modelos no coinciden acá — eso es lo interesante.</p>
+    <p id="insp-coords" class="coords"></p>
+  </div>
+
+  <!-- No-tiles card: total tile failure gets an explanation + retry, never a silent empty map -->
+  <div id="tarjeta-tiles" class="tarjeta" role="alert" hidden>
+    <h2>El mapa clasificado no cargó</h2>
+    <p id="tarjeta-tiles-texto" class="tarjeta-texto"></p>
+    <div class="tarjeta-acciones">
+      <button id="tarjeta-tiles-reintentar" class="btn-primario" type="button">Reintentar ↻</button>
+      <button id="tarjeta-tiles-cerrar" class="btn-secundario" type="button">Cerrar</button>
+    </div>
+  </div>
+
+  <section id="panel-metricas" aria-label="Métricas del benchmark" hidden>
+    <div class="panel-encabezado">
+      <h2>El benchmark 2×2</h2>
+      <button id="metricas-cerrar" class="cerrar" aria-label="Cerrar métricas">×</button>
+    </div>
+    <div id="metricas-contenido"><p>Cargando…</p></div>
+  </section>
+</div>
+
+<script src="vendor/leaflet.js" defer></script>
+<script src="vendor/leaflet-side-by-side.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

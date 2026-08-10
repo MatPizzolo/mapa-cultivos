@@ -1,0 +1,20 @@
+# Secrets — jamás en la imagen ni en el contexto de build
+.env
+*-key.json
+service-account*.json
+
+# Pesados y regenerables
+.venv/
+.cache/
+tiles/
+exports/
+*.tif
+*.tiff
+
+# Ruido
+.git/
+__pycache__/
+*.pyc
+.pytest_cache/
+docs/
+tests/

@@ -1,0 +1,1118 @@
+{
+  "generado": "2026-08-09T22:12:18Z",
+  "semilla": 42,
+  "zonas": {
+    "rio-cuarto": {
+      "campania_validada": "2024-25",
+      "muestras": {
+        "entrenamiento": 2500,
+        "validacion_mnc": 1500,
+        "validacion_independiente": 0
+      },
+      "modelos": {
+        "clasicas-rf": {
+          "acuerdo_mnc": {
+            "overall": 0.9433,
+            "kappa": 0.9292,
+            "ic95": [
+              0.9316,
+              0.955
+            ],
+            "n": 1500
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.9764,
+              "producer": 0.9667,
+              "user": 0.9864,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.8893,
+              "producer": 0.8833,
+              "user": 0.8953,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.9386,
+              "producer": 0.9433,
+              "user": 0.934,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9548,
+              "producer": 0.95,
+              "user": 0.9596,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": 0.9574,
+              "producer": 0.9733,
+              "user": 0.9419,
+              "soporte": 300
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                290,
+                1,
+                8,
+                1,
+                0,
+                0
+              ],
+              [
+                2,
+                265,
+                11,
+                4,
+                18,
+                0
+              ],
+              [
+                2,
+                8,
+                283,
+                7,
+                0,
+                0
+              ],
+              [
+                0,
+                14,
+                1,
+                285,
+                0,
+                0
+              ],
+              [
+                0,
+                8,
+                0,
+                0,
+                292,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        },
+        "clasicas-knn": {
+          "acuerdo_mnc": {
+            "overall": 0.9447,
+            "kappa": 0.9308,
+            "ic95": [
+              0.9331,
+              0.9562
+            ],
+            "n": 1500
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.9733,
+              "producer": 0.9733,
+              "user": 0.9733,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.8926,
+              "producer": 0.8867,
+              "user": 0.8986,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.926,
+              "producer": 0.8967,
+              "user": 0.9573,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9734,
+              "producer": 0.9767,
+              "user": 0.9702,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": 0.9565,
+              "producer": 0.99,
+              "user": 0.9252,
+              "soporte": 300
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                292,
+                1,
+                4,
+                0,
+                3,
+                0
+              ],
+              [
+                2,
+                266,
+                7,
+                6,
+                19,
+                0
+              ],
+              [
+                6,
+                20,
+                269,
+                3,
+                2,
+                0
+              ],
+              [
+                0,
+                6,
+                1,
+                293,
+                0,
+                0
+              ],
+              [
+                0,
+                3,
+                0,
+                0,
+                297,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        },
+        "embeddings-rf": {
+          "acuerdo_mnc": {
+            "overall": 0.9113,
+            "kappa": 0.8892,
+            "ic95": [
+              0.8969,
+              0.9257
+            ],
+            "n": 1500
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.9816,
+              "producer": 0.9767,
+              "user": 0.9865,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.8282,
+              "producer": 0.8433,
+              "user": 0.8135,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.9549,
+              "producer": 0.9533,
+              "user": 0.9565,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9072,
+              "producer": 0.88,
+              "user": 0.9362,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": 0.8871,
+              "producer": 0.9033,
+              "user": 0.8714,
+              "soporte": 300
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                293,
+                0,
+                5,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                253,
+                6,
+                8,
+                33,
+                0
+              ],
+              [
+                2,
+                7,
+                286,
+                2,
+                3,
+                0
+              ],
+              [
+                1,
+                29,
+                2,
+                264,
+                4,
+                0
+              ],
+              [
+                1,
+                22,
+                0,
+                6,
+                271,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        },
+        "embeddings-knn": {
+          "acuerdo_mnc": {
+            "overall": 0.906,
+            "kappa": 0.8825,
+            "ic95": [
+              0.8912,
+              0.9208
+            ],
+            "n": 1500
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.978,
+              "producer": 0.9633,
+              "user": 0.9931,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.8007,
+              "producer": 0.7433,
+              "user": 0.8677,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.9456,
+              "producer": 0.9267,
+              "user": 0.9653,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9307,
+              "producer": 0.94,
+              "user": 0.9216,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": 0.8723,
+              "producer": 0.9567,
+              "user": 0.8017,
+              "soporte": 300
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                289,
+                0,
+                5,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                223,
+                4,
+                15,
+                58,
+                0
+              ],
+              [
+                2,
+                10,
+                278,
+                1,
+                9,
+                0
+              ],
+              [
+                0,
+                14,
+                0,
+                282,
+                4,
+                0
+              ],
+              [
+                0,
+                10,
+                1,
+                2,
+                287,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        }
+      },
+      "ablacion_embeddings_un_anio": {
+        "overall": 0.868
+      },
+      "comparaciones": [
+        {
+          "a": "clasicas-rf",
+          "b": "embeddings-rf",
+          "n_pareado": 1500,
+          "delta_overall": 0.032,
+          "discordantes": [
+            93,
+            45
+          ],
+          "p": 0.0001,
+          "significativo": true
+        },
+        {
+          "a": "clasicas-knn",
+          "b": "embeddings-knn",
+          "n_pareado": 1500,
+          "delta_overall": 0.0387,
+          "discordantes": [
+            94,
+            36
+          ],
+          "p": 0.0,
+          "significativo": true
+        }
+      ],
+      "ablacion_split_aleatorio": {
+        "clasicas-rf": {
+          "bloques": 0.9433,
+          "aleatorio": 0.9433
+        },
+        "embeddings-rf": {
+          "bloques": 0.9113,
+          "aleatorio": 0.925
+        }
+      }
+    },
+    "pergamino": {
+      "campania_validada": "2024-25",
+      "muestras": {
+        "entrenamiento": 2000,
+        "validacion_mnc": 1200,
+        "validacion_independiente": 0
+      },
+      "modelos": {
+        "clasicas-rf": {
+          "acuerdo_mnc": {
+            "overall": 0.9467,
+            "kappa": 0.9289,
+            "ic95": [
+              0.934,
+              0.9594
+            ],
+            "n": 1200
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.9396,
+              "producer": 0.96,
+              "user": 0.9201,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.9327,
+              "producer": 0.9467,
+              "user": 0.9191,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.9468,
+              "producer": 0.92,
+              "user": 0.9753,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9681,
+              "producer": 0.96,
+              "user": 0.9763,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                288,
+                6,
+                1,
+                5,
+                0,
+                0
+              ],
+              [
+                10,
+                284,
+                6,
+                0,
+                0,
+                0
+              ],
+              [
+                7,
+                15,
+                276,
+                2,
+                0,
+                0
+              ],
+              [
+                8,
+                4,
+                0,
+                288,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        },
+        "clasicas-knn": {
+          "acuerdo_mnc": {
+            "overall": 0.9442,
+            "kappa": 0.9256,
+            "ic95": [
+              0.9312,
+              0.9572
+            ],
+            "n": 1200
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.9489,
+              "producer": 0.96,
+              "user": 0.9381,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.9208,
+              "producer": 0.93,
+              "user": 0.9118,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.9438,
+              "producer": 0.9233,
+              "user": 0.9652,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9633,
+              "producer": 0.9633,
+              "user": 0.9633,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                288,
+                8,
+                1,
+                3,
+                0,
+                0
+              ],
+              [
+                6,
+                279,
+                8,
+                7,
+                0,
+                0
+              ],
+              [
+                8,
+                14,
+                277,
+                1,
+                0,
+                0
+              ],
+              [
+                5,
+                5,
+                1,
+                289,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        },
+        "embeddings-rf": {
+          "acuerdo_mnc": {
+            "overall": 0.93,
+            "kappa": 0.9067,
+            "ic95": [
+              0.9156,
+              0.9444
+            ],
+            "n": 1200
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.9468,
+              "producer": 0.95,
+              "user": 0.9437,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.883,
+              "producer": 0.8933,
+              "user": 0.873,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.9508,
+              "producer": 0.9333,
+              "user": 0.9689,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9402,
+              "producer": 0.9433,
+              "user": 0.9371,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                285,
+                13,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                9,
+                268,
+                7,
+                16,
+                0,
+                0
+              ],
+              [
+                1,
+                18,
+                280,
+                1,
+                0,
+                0
+              ],
+              [
+                7,
+                8,
+                2,
+                283,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        },
+        "embeddings-knn": {
+          "acuerdo_mnc": {
+            "overall": 0.9292,
+            "kappa": 0.9056,
+            "ic95": [
+              0.9147,
+              0.9437
+            ],
+            "n": 1200
+          },
+          "accuracy_independiente": {
+            "overall": null,
+            "ic95": [
+              null,
+              null
+            ]
+          },
+          "por_clase": [
+            {
+              "codigo": 0,
+              "clase": "no agrícola",
+              "f1": 0.9559,
+              "producer": 0.94,
+              "user": 0.9724,
+              "soporte": 300
+            },
+            {
+              "codigo": 1,
+              "clase": "soja",
+              "f1": 0.89,
+              "producer": 0.89,
+              "user": 0.89,
+              "soporte": 300
+            },
+            {
+              "codigo": 2,
+              "clase": "maíz",
+              "f1": 0.9402,
+              "producer": 0.9433,
+              "user": 0.9371,
+              "soporte": 300
+            },
+            {
+              "codigo": 3,
+              "clase": "trigo/soja 2ª",
+              "f1": 0.9309,
+              "producer": 0.9433,
+              "user": 0.9188,
+              "soporte": 300
+            },
+            {
+              "codigo": 4,
+              "clase": "maní",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            },
+            {
+              "codigo": 5,
+              "clase": "pastura/verdeo",
+              "f1": null,
+              "producer": null,
+              "user": null,
+              "soporte": 0
+            }
+          ],
+          "matriz_confusion": {
+            "clases": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "filas": [
+              [
+                282,
+                12,
+                3,
+                3,
+                0,
+                0
+              ],
+              [
+                4,
+                267,
+                11,
+                18,
+                0,
+                0
+              ],
+              [
+                3,
+                10,
+                283,
+                4,
+                0,
+                0
+              ],
+              [
+                1,
+                11,
+                5,
+                283,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        }
+      },
+      "ablacion_embeddings_un_anio": {
+        "overall": 0.89
+      },
+      "comparaciones": [
+        {
+          "a": "clasicas-rf",
+          "b": "embeddings-rf",
+          "n_pareado": 1200,
+          "delta_overall": 0.0167,
+          "discordantes": [
+            47,
+            27
+          ],
+          "p": 0.0265,
+          "significativo": true
+        },
+        {
+          "a": "clasicas-knn",
+          "b": "embeddings-knn",
+          "n_pareado": 1200,
+          "delta_overall": 0.015,
+          "discordantes": [
+            44,
+            26
+          ],
+          "p": 0.0414,
+          "significativo": true
+        }
+      ]
+    }
+  }
+}
