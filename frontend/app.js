@@ -545,9 +545,31 @@ function cerrarAyuda() {
 // ---------- 7. Tour de casos ----------
 
 // Cada caso: { zona, latlng: [lat, lng], zoom, titulo, texto }.
-// TODO(task 8): casos reales aprobados por Mateo — hoy es un placeholder para
-// probar el andamiaje (chips + ficha); dibujarCasos() los filtra por zona.
-const CASOS = [];
+// Casos reales aprobados por Mateo (scripts/06_casos.py contra los exports RF de
+// 10 m; ver .superpowers/sdd/2026-08-10-visor-explicacion-desacuerdos/task-8-report.md).
+const CASOS = [
+  {
+    titulo: '🥜 ¿Maní o soja?',
+    texto: 'El comité de reglas ve soja de primera en esta franja; AlphaEarth ve maní. Es la mancha de desacuerdo más grande de Río Cuarto — la firma del maní se parece a la de la soja temprana, y acá el benchmark se pone a prueba en serio.',
+    zona: 'rio-cuarto',
+    latlng: [-34.15070, -64.57940],
+    zoom: 12,
+  },
+  {
+    titulo: '🌾 ¿Un cultivo o dos?',
+    texto: 'El comité de reglas ve soja de primera; AlphaEarth ve trigo seguido de soja de segunda. El embedding anual condensa los dos ciclos del doble cultivo en un solo vector por píxel, y ahí es donde patina.',
+    zona: 'pergamino',
+    latlng: [-33.84836, -60.77246],
+    zoom: 12,
+  },
+  {
+    titulo: '🌽 ¿Maíz o campo vacío?',
+    texto: 'El comité de reglas ve maíz en esta franja de Río Cuarto; AlphaEarth la marca como no agrícola. No es un cultivo confundido con otro — es el desacuerdo más de fondo que hay: si hay algo sembrado ahí o no.',
+    zona: 'rio-cuarto',
+    latlng: [-33.63761, -64.93715],
+    zoom: 12,
+  },
+];
 
 let casosZona = []; // CASOS filtrados por la zona activa; mostrarCaso(i) indexa acá
 
