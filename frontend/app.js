@@ -7,6 +7,7 @@
  *   3. Capas y cortina          — leaflet-side-by-side, clásicas (izq) vs embeddings (der)
  *   4. Inspector de píxel       — lee el color del tile en canvas y lo mapea a clase
  *   5. Panel de métricas        — renderiza metrics.json; null → "—", nunca un cero
+ *   6. Explicación              — onboarding de 2 pasos, toast de clasificador, hoja «?»
  */
 
 'use strict';
@@ -92,13 +93,9 @@ async function arrancar() {
 
   estado.mapa.on('click', inspeccionarPixel);
 
-  // Ephemeral hint: gone after the first interaction, or after 10 s.
-  setTimeout(ocultarHint, 10000);
-  estado.mapa.once('click', ocultarHint);
-}
-
-function ocultarHint() {
-  $('hint').classList.add('oculto');
+  mostrarOnboarding();
+  // First tap on the map closes onboarding, whichever step it's on.
+  estado.mapa.once('click', cerrarOnboarding);
 }
 
 function mostrarLeyenda(abierta) {
@@ -126,18 +123,36 @@ function conectarControles() {
   $('sel-clasificador').addEventListener('change', (e) => {
     estado.clasificador = e.target.value;
     actualizarCapas();
+    mostrarToast(TOAST_CLF[estado.clasificador]);
   });
 
   $('btn-metricas').addEventListener('click', () => {
     const panel = $('panel-metricas');
-    panel.hidden = !panel.hidden;
-    $('btn-metricas').setAttribute('aria-expanded', String(!panel.hidden));
-    if (!panel.hidden) dibujarMetricas();
+    const abrir = panel.hidden;
+    if (abrir) cerrarAyuda();
+    panel.hidden = !abrir;
+    $('btn-metricas').setAttribute('aria-expanded', String(abrir));
+    if (abrir) dibujarMetricas();
   });
   $('metricas-cerrar').addEventListener('click', () => {
     $('panel-metricas').hidden = true;
     $('btn-metricas').setAttribute('aria-expanded', 'false');
   });
+
+  $('btn-ayuda').addEventListener('click', () => {
+    const panel = $('panel-ayuda');
+    const abrir = panel.hidden;
+    if (abrir) {
+      $('panel-metricas').hidden = true;
+      $('btn-metricas').setAttribute('aria-expanded', 'false');
+    }
+    panel.hidden = !abrir;
+    $('btn-ayuda').setAttribute('aria-expanded', String(abrir));
+  });
+  $('ayuda-cerrar').addEventListener('click', cerrarAyuda);
+
+  $('onboarding-saltar').addEventListener('click', cerrarOnboarding);
+  $('onboarding-sig').addEventListener('click', () => pasoOnboarding(pasoActualOnboarding + 1));
 
   $('inspector-cerrar').addEventListener('click', cerrarInspector);
 
@@ -187,7 +202,10 @@ function actualizarCapas() {
   estado.cortinaX = null;
   estado.cortina.on('dividermove', (e) => {
     if (estado.cortinaX == null) { estado.cortinaX = e.x; return; }
-    if (e.x !== estado.cortinaX) { estado.cortinaX = e.x; ocultarHint(); }
+    if (e.x !== estado.cortinaX) {
+      estado.cortinaX = e.x;
+      if (!$('onboarding').hidden && pasoActualOnboarding === 0) pasoOnboarding(1);
+    }
   });
 
   // Si los tiles de los modelos no cargan, se explica en vez de fallar mudo.
@@ -410,6 +428,59 @@ function dibujarMetricas() {
       fotointerpretados a mano, con su intervalo de confianza del 95 %.</p>
     <p class="nota-metrica">*Kappa se reporta por convención; ninguna conclusión se apoya en él
       (Pontius &amp; Millones, 2011).</p>`;
+}
+
+// ---------- 6. Explicación ----------
+
+const PASOS_ONBOARDING = [
+  'Dos IA distintas clasificaron cada lote de esta zona. <b>Arrastrá la línea</b> y encontrá dónde no se ponen de acuerdo.',
+  'Tocá cualquier lote para ver qué dijo cada una — y qué dice el mapa del INTA en ese mismo punto.',
+];
+const TOAST_CLF = {
+  rf: 'RF: 300 reglas simples votan qué cultivo es — gana la mayoría',
+  knn: 'kNN: busca los 5 lotes conocidos más parecidos y copia su etiqueta',
+};
+
+let pasoActualOnboarding = 0;
+let toastTimeout = null;
+
+function mostrarOnboarding() {
+  if (localStorage.getItem('onboarding-visto')) return;
+  pasoActualOnboarding = 0;
+  pintarPasoOnboarding();
+  $('onboarding').hidden = false;
+}
+
+function pintarPasoOnboarding() {
+  $('onboarding-texto').innerHTML = PASOS_ONBOARDING[pasoActualOnboarding];
+  $('onboarding-paso').textContent = `${pasoActualOnboarding + 1} de ${PASOS_ONBOARDING.length}`;
+  $('onboarding-sig').textContent =
+    pasoActualOnboarding === PASOS_ONBOARDING.length - 1 ? '¡Listo!' : 'Siguiente →';
+}
+
+function pasoOnboarding(n) {
+  if ($('onboarding').hidden) return;
+  if (n >= PASOS_ONBOARDING.length) { cerrarOnboarding(); return; }
+  pasoActualOnboarding = n;
+  pintarPasoOnboarding();
+}
+
+function cerrarOnboarding() {
+  $('onboarding').hidden = true;
+  localStorage.setItem('onboarding-visto', '1');
+}
+
+function mostrarToast(texto) {
+  const toast = $('toast-clasificador');
+  toast.textContent = texto;
+  toast.classList.add('visible');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('visible'), 4000);
+}
+
+function cerrarAyuda() {
+  $('panel-ayuda').hidden = true;
+  $('btn-ayuda').setAttribute('aria-expanded', 'false');
 }
 
 document.addEventListener('DOMContentLoaded', arrancar);

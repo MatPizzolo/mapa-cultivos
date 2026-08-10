@@ -14,6 +14,7 @@
 
 <header class="topbar">
   <h1>Mapa de Cultivos con IA</h1>
+  <button id="btn-ayuda" type="button" aria-expanded="false" aria-controls="panel-ayuda">?</button>
   <p class="subtitulo">Dos modelos miran el mismo lote — compará vos</p>
   <div class="controles" role="group" aria-label="Controles del visor">
     <label class="control">
@@ -35,8 +36,8 @@
     <label class="control">
       <span class="control-nombre">Clasificador</span>
       <select id="sel-clasificador">
-        <option value="rf" selected>RF</option>
-        <option value="knn">kNN</option>
+        <option value="rf" selected>Comité de reglas (RF)</option>
+        <option value="knn">Por similitud (kNN)</option>
       </select>
     </label>
   </div>
@@ -67,7 +68,19 @@
 
   <button id="btn-metricas" type="button" aria-expanded="false" aria-controls="panel-metricas">Métricas</button>
 
-  <p id="hint" class="hint">Arrastrá la cortina para comparar · tocá el mapa para inspeccionar un píxel</p>
+  <div id="toast-clasificador" class="toast-clf" role="status"></div>
+
+  <div id="onboarding" class="onboarding-backdrop" hidden>
+    <div class="onboarding-tarjeta" role="dialog" aria-label="Bienvenida">
+      <p class="paso-num" id="onboarding-paso">1 de 2</p>
+      <p id="onboarding-texto">Dos IA distintas clasificaron cada lote de esta zona.
+        <b>Arrastrá la línea</b> y encontrá dónde no se ponen de acuerdo.</p>
+      <div class="onboarding-acciones">
+        <button id="onboarding-saltar" class="btn-secundario" type="button">Saltar</button>
+        <button id="onboarding-sig" class="btn-primario" type="button">Siguiente →</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Ficha del inspector de píxel: el desacuerdo entre modelos es el contenido, no un error -->
   <div id="inspector" class="tarjeta" role="dialog" aria-label="Inspector de píxel" hidden>
@@ -100,6 +113,23 @@
       <button id="metricas-cerrar" class="cerrar" aria-label="Cerrar métricas">×</button>
     </div>
     <div id="metricas-contenido"><p>Cargando…</p></div>
+  </section>
+
+  <section id="panel-ayuda" aria-label="Cómo se hizo este mapa" hidden>
+    <div class="panel-encabezado"><h2>Cómo se hizo este mapa</h2>
+      <button id="ayuda-cerrar" class="cerrar" aria-label="Cerrar ayuda">×</button></div>
+    <p><b>Dos maneras de mirar el satélite.</b> «Clásico S2»: seis fotos del ciclo del cultivo más
+      índices de vigor, elegidos por agrónomos. «AlphaEarth»: el resumen automático del año entero
+      que arma la IA de Google.</p>
+    <p><b>Dos maneras de decidir.</b> Comité de reglas (RF): 300 reglas simples miran cada lote y
+      votan — gana la mayoría. Por similitud (kNN): busca los 5 lotes conocidos más parecidos y
+      copia su etiqueta.</p>
+    <p><b>Contra qué se compara.</b> El Mapa Nacional de Cultivos del INTA — que también es un mapa
+      hecho por computadora, con sus propios errores. Por eso acá hablamos de <b>acuerdo</b> entre
+      mapas y no de precisión. La precisión real se mide aparte, contra puntos revisados a mano.</p>
+    <p class="nota-metrica">Referencia: Mapa Nacional de Cultivos 2024/25, INTA (de Abelleyra et al.),
+      CC-BY 4.0 · doi:10.5281/zenodo.17652712.</p>
+    <!-- TODO(mateo): sumar link al repo cuando esté publicado -->
   </section>
 </div>
 
