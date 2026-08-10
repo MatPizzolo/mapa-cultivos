@@ -94,8 +94,6 @@ async function arrancar() {
   estado.mapa.on('click', inspeccionarPixel);
 
   mostrarOnboarding();
-  // First tap on the map closes onboarding, whichever step it's on.
-  estado.mapa.once('click', cerrarOnboarding);
 }
 
 function mostrarLeyenda(abierta) {
@@ -443,6 +441,7 @@ const TOAST_CLF = {
 
 let pasoActualOnboarding = 0;
 let toastTimeout = null;
+let onboardingClickCierre = null; // click-on-map closer, armed only during the last step
 
 function mostrarOnboarding() {
   if (localStorage.getItem('onboarding-visto')) return;
@@ -463,11 +462,21 @@ function pasoOnboarding(n) {
   if (n >= PASOS_ONBOARDING.length) { cerrarOnboarding(); return; }
   pasoActualOnboarding = n;
   pintarPasoOnboarding();
+  // Only the last step closes on a map tap (a tap during step 0 is likely the
+  // user reaching for the curtain, not asking to dismiss the onboarding).
+  if (pasoActualOnboarding === PASOS_ONBOARDING.length - 1 && !onboardingClickCierre) {
+    onboardingClickCierre = () => cerrarOnboarding();
+    estado.mapa.once('click', onboardingClickCierre);
+  }
 }
 
 function cerrarOnboarding() {
   $('onboarding').hidden = true;
   localStorage.setItem('onboarding-visto', '1');
+  if (onboardingClickCierre) {
+    estado.mapa.off('click', onboardingClickCierre);
+    onboardingClickCierre = null;
+  }
 }
 
 function mostrarToast(texto) {
