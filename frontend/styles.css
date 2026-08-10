@@ -137,6 +137,35 @@ button { -webkit-tap-highlight-color: transparent; }
   outline-offset: 2px;
 }
 
+/* ---- segmented control: Comparar | Desacuerdos ---- */
+
+.seg {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.seg button {
+  flex: 1;
+  min-height: 36px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seg button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--verde);
+}
+
 /* ---- warning bands ---- */
 
 .banda-aviso {
@@ -203,6 +232,56 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* Zoom control sits below the right-side label */
 .leaflet-top.leaflet-right { top: 40px; }
+
+/* ---- modo Desacuerdos: fondo desaturado, el magenta queda como única figura ---- */
+
+.modo-desacuerdos .leaflet-pane-base { filter: saturate(.25) brightness(1.05); }
+
+.linea-desacuerdo {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  max-width: 84vw;
+  text-align: center;
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--tinta);
+  box-shadow: var(--sombra);
+}
+
+/* ---- tour de casos: chips flotantes sobre el mapa en modo Desacuerdos ---- */
+
+.casos {
+  position: absolute;
+  top: 46px;
+  left: 10px;
+  right: 10px;
+  z-index: 1000;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chip-caso {
+  flex: none;
+  min-height: 36px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: var(--panel);
+  color: var(--tinta);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: var(--sombra);
+  cursor: pointer;
+}
 
 /* ---- floating chips: legend toggle (left) and metrics (right) ---- */
 

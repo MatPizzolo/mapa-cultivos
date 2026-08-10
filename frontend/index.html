@@ -16,6 +16,10 @@
   <h1>Mapa de Cultivos con IA</h1>
   <button id="btn-ayuda" type="button" aria-expanded="false" aria-controls="panel-ayuda">?</button>
   <p class="subtitulo">Dos modelos miran el mismo lote — compará vos</p>
+  <div class="seg" role="tablist" aria-label="Modo del visor">
+    <button id="modo-comparar" type="button" role="tab" aria-pressed="true">Comparar</button>
+    <button id="modo-desacuerdos" type="button" role="tab" aria-pressed="false">Desacuerdos</button>
+  </div>
   <div class="controles" role="group" aria-label="Controles del visor">
     <label class="control">
       <span class="control-nombre">Zona</span>
@@ -59,6 +63,16 @@
 
   <span class="etiqueta-lado etiqueta-izq" aria-hidden="true">Clásico S2</span>
   <span class="etiqueta-lado etiqueta-der" aria-hidden="true">AlphaEarth</span>
+
+  <p id="linea-desacuerdo" class="linea-desacuerdo" role="status" hidden></p>
+
+  <div id="casos" class="casos" role="group" aria-label="Casos destacados" hidden></div>
+
+  <div id="ficha-caso" class="tarjeta" role="dialog" aria-label="Caso destacado" hidden>
+    <button id="ficha-caso-cerrar" class="cerrar" aria-label="Cerrar caso">×</button>
+    <h2 id="ficha-caso-titulo"></h2>
+    <p id="ficha-caso-texto" class="tarjeta-texto"></p>
+  </div>
 
   <button id="leyenda-toggle" type="button" aria-expanded="false" aria-controls="leyenda">▲ Clases</button>
   <aside id="leyenda" aria-label="Leyenda de clases" hidden>

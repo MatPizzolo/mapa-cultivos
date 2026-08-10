@@ -8,6 +8,7 @@
  *   4. Inspector de píxel       — lee el color del tile en canvas y lo mapea a clase
  *   5. Panel de métricas        — renderiza metrics.json; null → "—", nunca un cero
  *   6. Explicación              — onboarding de 2 pasos, toast de clasificador, hoja «?»
+ *   7. Tour de casos            — chips de casos destacados en modo Desacuerdos
  */
 
 'use strict';
@@ -42,13 +43,16 @@ const estado = {
   zona: 'rio-cuarto',
   campania: '2024-25',
   clasificador: 'rf', // la cortina siempre compara filas: clásicas vs embeddings
+  modo: 'comparar',    // 'comparar' | 'desacuerdos'
   leyenda: null,      // /leyenda
   metrics: null,      // /metrics
   zonas: null,        // /zonas — department outlines, drawn always, highlighted on failure
+  desacuerdo: null,   // /desacuerdo
   mapa: null,
   capaIzq: null,      // clásicas
   capaDer: null,      // embeddings
   capaMnc: null,      // invisible: solo la lee el inspector
+  capaDesacuerdo: null, // magenta: solo visible en modo Desacuerdos
   capaZona: null,
   cortina: null,
   cortinaX: null,     // last divider position; used to tell real drags from init events
@@ -58,14 +62,16 @@ const estado = {
 };
 
 async function arrancar() {
-  const [leyenda, metrics, zonas] = await Promise.all([
+  const [leyenda, metrics, zonas, desacuerdo] = await Promise.all([
     fetch('/leyenda').then((r) => r.json()),
     fetch('/metrics').then((r) => r.json()),
     fetch('/zonas').then((r) => r.json()),
+    fetch('/desacuerdo').then((r) => r.json()),
   ]);
   estado.leyenda = leyenda;
   estado.metrics = metrics;
   estado.zonas = zonas;
+  estado.desacuerdo = desacuerdo;
 
   const vista = VISTAS[estado.zona];
   estado.mapa = L.map('map', {
@@ -77,10 +83,17 @@ async function arrancar() {
   });
   L.control.zoom({ position: 'topright' }).addTo(estado.mapa);
 
+  // Pane propio para el mapa base: así el filtro de desaturación del modo
+  // Desacuerdos (styles.css) toca solo el fondo y nunca los overlays.
+  estado.mapa.createPane('base');
+  estado.mapa.getPane('base').classList.add('leaflet-pane-base');
+  estado.mapa.getPane('base').style.zIndex = 150;
+
   // Mapa base liviano, solo para orientarse: los tiles clasificados van encima.
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap',
     maxZoom: ZOOM_MAX,
+    pane: 'base',
   }).addTo(estado.mapa);
 
   dibujarLeyenda();
@@ -103,6 +116,9 @@ function mostrarLeyenda(abierta) {
 }
 
 function conectarControles() {
+  $('modo-comparar').addEventListener('click', () => cambiarModo('comparar'));
+  $('modo-desacuerdos').addEventListener('click', () => cambiarModo('desacuerdos'));
+
   $('sel-zona').addEventListener('change', (e) => {
     estado.zona = e.target.value;
     const vista = VISTAS[estado.zona];
@@ -153,6 +169,7 @@ function conectarControles() {
   $('onboarding-sig').addEventListener('click', () => pasoOnboarding(pasoActualOnboarding + 1));
 
   $('inspector-cerrar').addEventListener('click', cerrarInspector);
+  $('ficha-caso-cerrar').addEventListener('click', cerrarFicha);
 
   $('leyenda-toggle').addEventListener('click', () => mostrarLeyenda($('leyenda').hidden));
 
@@ -172,13 +189,23 @@ function urlTiles(modelo) {
   return `${TILES_BASE}/${CORRIDA}/${estado.zona}/${estado.campania}/${modelo}/{z}/{x}/{y}.png`;
 }
 
+function cambiarModo(modo) {
+  if (estado.modo === modo) return;
+  estado.modo = modo;
+  $('modo-comparar').setAttribute('aria-pressed', String(modo === 'comparar'));
+  $('modo-desacuerdos').setAttribute('aria-pressed', String(modo === 'desacuerdos'));
+  actualizarCapas();
+}
+
 function actualizarCapas() {
   const m = estado.mapa;
   if (estado.cortina) { estado.cortina.remove(); estado.cortina = null; }
-  for (const clave of ['capaIzq', 'capaDer', 'capaMnc']) {
+  for (const clave of ['capaIzq', 'capaDer', 'capaMnc', 'capaDesacuerdo']) {
     if (estado[clave]) { m.removeLayer(estado[clave]); estado[clave] = null; }
   }
   cerrarInspector();
+  cerrarFicha();
+  $('map').classList.toggle('modo-desacuerdos', estado.modo === 'desacuerdos');
 
   // Fresh attempt: reset the no-tiles state machine.
   estado.algunTileCargado = false;
@@ -190,26 +217,49 @@ function actualizarCapas() {
   // crossOrigin es necesario para que el inspector pueda leer el tile en canvas;
   // requiere CORS habilitado en el bucket (SPEC §9).
   const opciones = { maxNativeZoom: ZOOM_MAX, maxZoom: ZOOM_MAX, crossOrigin: 'anonymous', opacity: 0.85 };
-  estado.capaIzq = L.tileLayer(urlTiles(`clasicas-${estado.clasificador}`), opciones).addTo(m);
-  estado.capaDer = L.tileLayer(urlTiles(`embeddings-${estado.clasificador}`), opciones).addTo(m);
-  // Capa invisible del MNC: no se ve, pero el inspector la lee para la fila "MNC (INTA)".
-  estado.capaMnc = L.tileLayer(urlTiles('mnc'), { ...opciones, opacity: 0 }).addTo(m);
-  estado.cortina = L.control.sideBySide(estado.capaIzq, estado.capaDer).addTo(m);
-  // side-by-side fires dividermove during init and on every map move; only a
-  // change in x means the user actually dragged the curtain.
-  estado.cortinaX = null;
-  estado.cortina.on('dividermove', (e) => {
-    if (estado.cortinaX == null) { estado.cortinaX = e.x; return; }
-    if (e.x !== estado.cortinaX) {
-      estado.cortinaX = e.x;
-      if (!$('onboarding').hidden && pasoActualOnboarding === 0) pasoOnboarding(1);
-    }
-  });
 
-  // Si los tiles de los modelos no cargan, se explica en vez de fallar mudo.
-  for (const capa of [estado.capaIzq, estado.capaDer]) {
-    capa.on('tileload', tilesCargaron);
-    capa.on('tileerror', fallaTiles);
+  if (estado.modo === 'desacuerdos') {
+    // Las tres capas del inspector siguen cargadas, pero invisibles: el modo
+    // Desacuerdos no es la cortina, es una lectura distinta de los mismos datos.
+    estado.capaIzq = L.tileLayer(urlTiles(`clasicas-${estado.clasificador}`), { ...opciones, opacity: 0 }).addTo(m);
+    estado.capaDer = L.tileLayer(urlTiles(`embeddings-${estado.clasificador}`), { ...opciones, opacity: 0 }).addTo(m);
+    estado.capaMnc = L.tileLayer(urlTiles('mnc'), { ...opciones, opacity: 0 }).addTo(m);
+    estado.capaDesacuerdo = L.tileLayer(urlTiles(`desacuerdo-${estado.clasificador}`), { ...opciones, opacity: 0.9 }).addTo(m);
+    estado.capaDesacuerdo.on('tileload', tilesCargaron);
+    estado.capaDesacuerdo.on('tileerror', fallaTiles);
+
+    const pct = estado.desacuerdo?.zonas?.[estado.zona]?.[estado.clasificador];
+    $('linea-desacuerdo').textContent = pct == null
+      ? 'En magenta, los píxeles donde los dos enfoques no coinciden.'
+      : `En magenta, los píxeles donde los dos enfoques no coinciden (${(pct * 100).toFixed(1).replace('.', ',')} % del área).`;
+    $('linea-desacuerdo').hidden = false;
+    dibujarCasos();
+  } else {
+    estado.capaIzq = L.tileLayer(urlTiles(`clasicas-${estado.clasificador}`), opciones).addTo(m);
+    estado.capaDer = L.tileLayer(urlTiles(`embeddings-${estado.clasificador}`), opciones).addTo(m);
+    // Capa invisible del MNC: no se ve, pero el inspector la lee para la fila "MNC (INTA)".
+    estado.capaMnc = L.tileLayer(urlTiles('mnc'), { ...opciones, opacity: 0 }).addTo(m);
+    estado.cortina = L.control.sideBySide(estado.capaIzq, estado.capaDer).addTo(m);
+    // side-by-side fires dividermove during init and on every map move; only a
+    // change in x means the user actually dragged the curtain.
+    estado.cortinaX = null;
+    estado.cortina.on('dividermove', (e) => {
+      if (estado.cortinaX == null) { estado.cortinaX = e.x; return; }
+      if (e.x !== estado.cortinaX) {
+        estado.cortinaX = e.x;
+        if (!$('onboarding').hidden && pasoActualOnboarding === 0) pasoOnboarding(1);
+      }
+    });
+
+    // Si los tiles de los modelos no cargan, se explica en vez de fallar mudo.
+    for (const capa of [estado.capaIzq, estado.capaDer]) {
+      capa.on('tileload', tilesCargaron);
+      capa.on('tileerror', fallaTiles);
+    }
+
+    $('linea-desacuerdo').hidden = true;
+    $('casos').hidden = true;
+    $('ficha-caso').hidden = true;
   }
 }
 
@@ -490,6 +540,45 @@ function mostrarToast(texto) {
 function cerrarAyuda() {
   $('panel-ayuda').hidden = true;
   $('btn-ayuda').setAttribute('aria-expanded', 'false');
+}
+
+// ---------- 7. Tour de casos ----------
+
+// Cada caso: { zona, latlng: [lat, lng], zoom, titulo, texto }.
+// TODO(task 8): casos reales aprobados por Mateo — hoy es un placeholder para
+// probar el andamiaje (chips + ficha); dibujarCasos() los filtra por zona.
+const CASOS = [];
+
+let casosZona = []; // CASOS filtrados por la zona activa; mostrarCaso(i) indexa acá
+
+function dibujarCasos() {
+  casosZona = CASOS.filter((c) => c.zona === estado.zona);
+  cerrarFicha();
+  if (casosZona.length === 0) {
+    $('casos').hidden = true;
+    $('casos').innerHTML = '';
+    return;
+  }
+  $('casos').innerHTML = casosZona
+    .map((c, i) => `<button class="chip-caso" type="button" data-indice="${i}">${c.titulo}</button>`)
+    .join('');
+  $('casos').querySelectorAll('.chip-caso').forEach((btn) => {
+    btn.addEventListener('click', () => mostrarCaso(Number(btn.dataset.indice)));
+  });
+  $('casos').hidden = false;
+}
+
+function mostrarCaso(i) {
+  const caso = casosZona[i];
+  if (!caso) return;
+  estado.mapa.setView(caso.latlng, caso.zoom);
+  $('ficha-caso-titulo').textContent = caso.titulo;
+  $('ficha-caso-texto').textContent = caso.texto;
+  $('ficha-caso').hidden = false;
+}
+
+function cerrarFicha() {
+  $('ficha-caso').hidden = true;
 }
 
 document.addEventListener('DOMContentLoaded', arrancar);
