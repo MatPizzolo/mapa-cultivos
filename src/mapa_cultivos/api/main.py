@@ -37,6 +37,11 @@ def zonas() -> FileResponse:
     return FileResponse(DATA_DIR / "zonas.geojson", media_type="application/geo+json")
 
 
+@app.get("/desacuerdo")
+def desacuerdo() -> FileResponse:
+    return FileResponse(DATA_DIR / "desacuerdo.json", media_type="application/json")
+
+
 @app.post("/clasificar", response_model=ClasificarResponse)
 def clasificar(req: ClasificarRequest) -> ClasificarResponse:
     # TODO(capa 4): clasificación en vivo contra Earth Engine — límite 5.000 ha,

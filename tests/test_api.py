@@ -36,6 +36,15 @@ def test_zonas_contract():
     assert {f["properties"]["zona"] for f in body["features"]} == {"rio-cuarto", "pergamino"}
 
 
+def test_desacuerdo_contract():
+    r = client.get("/desacuerdo")
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body["zonas"]) == {"rio-cuarto", "pergamino"}
+    for z in body["zonas"].values():
+        assert set(z) == {"rf", "knn"}
+
+
 def test_clasificar_503_en_espanol_sin_romper():
     r = client.post(
         "/clasificar",

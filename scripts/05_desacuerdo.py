@@ -22,9 +22,15 @@ from mapa_cultivos import desacuerdo, tiles
 from mapa_cultivos.settings import DATA_DIR, REPO_ROOT, settings
 from mapa_cultivos.zonas import ZONAS
 
-# Placeholder disagreement color; Task 3 may swap it after visual validation
-# against the class palette. Keep it a single constant so that change is one line.
-COLOR_DESACUERDO = "#E91E8C"
+# Validated with the dataviz palette validator (Task 3) against every color in
+# data/leyenda.json: #E91E8C failed the CVD-separation floor (ΔE < 6, deutan)
+# against soja/trigo-soja2a/pastura-verdeo/no-agricola. Of the two fallbacks in
+# the brief, #C2185B clears the CVD and normal-vision floors against every
+# class except a narrow near-miss on maní (ΔE 14.6 normal-vision, vs the 15.0
+# floor) — accepted because the disagreement layer carries a secondary
+# encoding (it's the only overlay in its mode, over a desaturated basemap) and
+# because #8E24AA's near-miss against trigo/soja-2ª was worse (ΔE 11.6).
+COLOR_DESACUERDO = "#C2185B"
 
 CLASIFICADORES = ("rf", "knn")
 
