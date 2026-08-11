@@ -37,7 +37,8 @@ Enmascarado de nubes y sombras. Reemplaza a `QA60` y a `s2cloudless`, que dejan 
 sombras de nube — justo lo que arruina un composite de mediana.
 
 - **Banda:** `cs`. Se descarta todo píxel con `cs < 0.60`.
-- **Por qué 0.60:** es el mismo umbral que usa [`../../monitoring`](../../monitoring/README.md),
+- **Por qué 0.60:** es el mismo umbral que usa
+  [`../../monitor-cultivos-ndvi`](../../monitor-cultivos-ndvi/README.md),
   elegido a propósito para que los dos proyectos del portfolio sean comparables entre sí. Un umbral
   más alto deja huecos en las ventanas invernales, que es cuando más nubosidad hay.
 - **Se linkea por índice de imagen** con la colección de Sentinel-2, no por fecha.
