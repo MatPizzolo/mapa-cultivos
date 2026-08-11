@@ -13,7 +13,7 @@ This script is exploratory evidence, not a regenerated-artifact script like
 02_benchmark.py or 05_desacuerdo.py: its stdout is read by a human, not written
 back to a versioned JSON.
 
-  uv run python scripts/06_casos.py --exports-dir /path/to/exports --corrida 2026-08-09a
+  uv run python scripts/06_casos.py --exports-dir /path/to/exports --campania 2024-25
 """
 
 import argparse
