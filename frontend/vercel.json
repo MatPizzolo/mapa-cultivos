@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/leyenda", "destination": "/leyenda.json" },
+    { "source": "/metrics", "destination": "/metrics.json" },
+    { "source": "/zonas", "destination": "/zonas.geojson" },
+    { "source": "/desacuerdo", "destination": "/desacuerdo.json" }
+  ]
+}
